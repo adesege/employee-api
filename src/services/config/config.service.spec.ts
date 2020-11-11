@@ -1,0 +1,22 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from './config.service';
+
+describe('ConfigService', () => {
+  let service: ConfigService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [ConfigService],
+    }).compile();
+
+    service = module.get<ConfigService>(ConfigService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  it('should be get NODE_ENV environment variable', () => {
+    expect(service.get<string>('NODE_ENV')).toEqual('test');
+  });
+});
