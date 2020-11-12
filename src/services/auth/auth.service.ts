@@ -19,19 +19,23 @@ export class AuthService {
 
     const isEqual = await user.comparePassword(password);
     if (isEqual) {
-      return { ...user, password: undefined };
+      return { ...this.toJSON(user.toJSON()), password: undefined };
     }
     return null;
   }
 
   signToken(user: Partial<User>): Promise<string> {
-    const payload = {
+    const payload = this.toJSON(user);
+    return this.jwtService.signAsync(payload);
+  }
+
+  toJSON(user: Partial<User>): Partial<User> {
+    return {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       roles: user.roles,
       id: user.id
-    };
-    return this.jwtService.signAsync(payload);
+    }
   }
 }

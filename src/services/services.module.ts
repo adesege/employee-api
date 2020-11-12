@@ -1,18 +1,21 @@
 import Joi from '@hapi/joi';
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { BcryptService } from './bcrypt/bcrypt.service';
 import { ConfigService } from './config/config.service';
 import { JwtConfigService } from './jwt-config/jwt-config.service';
 import { MongooseConfigService } from './mongoose-config/mongoose-config.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 const providers = [
   ConfigService,
   MongooseConfigService,
   BcryptService,
   AuthService,
-  JwtConfigService
+  JwtConfigService,
+  JwtStrategy
 ];
 
 @Global()
@@ -30,6 +33,9 @@ const providers = [
         JWT_EXPIRES_IN: Joi.string().default('1d'),
         JWT_SECRET: Joi.string().required(),
       }).required()
+    }),
+    JwtModule.registerAsync({
+      useClass: JwtConfigService,
     }),
   ],
   providers,
