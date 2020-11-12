@@ -10,7 +10,7 @@ export type UserDocument = User & Document;
 
 @Schema()
 export class User {
-  @Prop()
+  @Prop({ unique: true })
   id: string;
 
   @Prop({ required: true })
@@ -32,6 +32,8 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.index({ firstName: 'text', lastName: 'text', email: 'text' });
 
 UserSchema.methods.comparePassword = function comparePassword(value: string): Promise<boolean> {
   return bcryptService.compare(value, this.password)
