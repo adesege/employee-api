@@ -8,7 +8,7 @@ import { User } from 'schemas/user.schema';
 export class EmployeeEvent {
   constructor(@InjectQueue(EMPLOYEE_EVENT_TYPE) private readonly employeeQueue: Queue) { }
 
-  updateEmployee(employee: User): Promise<Job<any>> {
+  updateEmployee(employee: Partial<User>): Promise<Job<any>> {
     return this.employeeQueue.add(UPDATE_EMPLOYEE_EVENT, employee, { priority: 2, removeOnComplete: true })
   }
 }

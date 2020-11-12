@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '../config/config.service';
 import { MongooseConfigService } from './mongoose-config.service';
 
 describe('MongooseConfigService', () => {
@@ -6,7 +7,7 @@ describe('MongooseConfigService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MongooseConfigService],
+      providers: [MongooseConfigService, ConfigService],
     }).compile();
 
     service = module.get<MongooseConfigService>(MongooseConfigService);

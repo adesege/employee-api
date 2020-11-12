@@ -47,6 +47,10 @@ export class User {
   status?: StatusEnum;
 
   comparePassword: (value: string) => Promise<boolean>;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
