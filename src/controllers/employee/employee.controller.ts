@@ -22,11 +22,18 @@ export class EmployeeController {
 
   @Get()
   async search(@Query() query: SearchEmployeeDTO): Promise<EmployeeTransformer> {
-    const user = await this.userModel
+    const employees = await this.userModel
       .find({ $text: { $search: query.search, $caseSensitive: false } })
       .select(['firstName', 'lastName', 'email', 'id']);
 
-    return new EmployeeTransformer(user);
+    const newEmployees = await Promise.all(
+      employees.map(async employee => ({
+        ...employee.toJSON(),
+        ipAddresses: await this.ipAddressModel.find({ user: employee._id })
+      }))
+    )
+
+    return new EmployeeTransformer(newEmployees);
   }
 
   @Post()
