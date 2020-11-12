@@ -8,7 +8,8 @@ export class MongooseConfigService implements MongooseOptionsFactory {
 
   createMongooseOptions(): MongooseModuleOptions {
     return {
-      uri: this.configService.get('MONGO_URI')
+      uri: this.configService.get('MONGO_URI'),
+      useCreateIndex: true
     };
   }
 }

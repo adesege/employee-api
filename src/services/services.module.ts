@@ -1,9 +1,13 @@
 import Joi from '@hapi/joi';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { BcryptService } from './bcrypt/bcrypt.service';
 import { ConfigService } from './config/config.service';
 import { MongooseConfigService } from './mongoose-config/mongoose-config.service';
 
+const providers = [ConfigService, MongooseConfigService, BcryptService];
+
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +22,7 @@ import { MongooseConfigService } from './mongoose-config/mongoose-config.service
       }).required()
     }),
   ],
-  providers: [ConfigService, MongooseConfigService]
+  providers,
+  exports: providers
 })
 export class ServicesModule { }
