@@ -1,5 +1,6 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { CreateEmployeeDTO } from 'dtos/create-employee.dto';
 import { SearchEmployeeDTO } from 'dtos/search-employee.dto';
 import { SystemAdminGuard } from 'guards/system-admin.guard';
 import { Model } from 'mongoose';
@@ -20,4 +21,13 @@ export class EmployeeController {
 
     return new EmployeeTransformer(user);
   }
+
+  @Post()
+  async create(@Body() body: CreateEmployeeDTO): Promise<Record<string, string>> {
+
+    await this.userModel.create({ ...body, email: body.email.toLowerCase() });
+
+    return { message: 'Employee created successfully' };
+  }
+
 }
