@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { AdminUpdateEmployeeDTO } from 'dtos/admin-update-employee.dto';
 import { CreateEmployeeDTO } from 'dtos/create-employee.dto';
@@ -37,11 +37,12 @@ export class AdminEmployeeController {
   }
 
   @Post()
-  async create(@Body() body: CreateEmployeeDTO): Promise<Record<string, string>> {
+  @HttpCode(200)
+  async create(@Body() body: CreateEmployeeDTO): Promise<EmployeeTransformer> {
 
-    await this.userModel.create({ ...body, email: body.email.toLowerCase() });
+    const employee = await this.userModel.create(body);
 
-    return { message: 'Employee created successfully' };
+    return new EmployeeTransformer(employee.toJSON());
   }
 
   @Patch(':employeeId')

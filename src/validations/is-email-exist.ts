@@ -17,6 +17,9 @@ export class IsEmailExistConstraint implements ValidatorConstraintInterface {
   ) { }
 
   async validate(email = ''): Promise<boolean> {
+    if (!email) {
+      return true;
+    }
     const user = await this.userModel.findOne({ email: { $regex: email, $options: 'i' } });
     return !!user;
   }
