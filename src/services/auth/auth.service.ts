@@ -14,7 +14,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<Partial<User>> {
     const user = await this.userModel.findOne({
-      email: email,
+      email: { $regex: email, $options: 'i' },
       status: StatusEnum.ACTIVATED
     });
     if (!user) return null;

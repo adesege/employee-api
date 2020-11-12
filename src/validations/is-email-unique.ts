@@ -17,9 +17,10 @@ export class IsEmailUniqueConstraint implements ValidatorConstraintInterface {
   ) { }
 
   async validate(email = ''): Promise<boolean> {
-    const user = await this.userModel.findOne({ email: email.toLowerCase() });
+    const user = await this.userModel.findOne({ email: { $regex: email, $options: 'i' } });
     return !user;
   }
+
 
   defaultMessage(): string {
     return 'An employee with this email address already exist';

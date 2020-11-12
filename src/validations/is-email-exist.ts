@@ -16,8 +16,8 @@ export class IsEmailExistConstraint implements ValidatorConstraintInterface {
   constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) { }
 
-  async validate(email: string): Promise<boolean> {
-    const user = await this.userModel.findOne({ email: email.toString().toLowerCase() });
+  async validate(email = ''): Promise<boolean> {
+    const user = await this.userModel.findOne({ email: { $regex: email, $options: 'i' } });
     return !!user;
   }
 

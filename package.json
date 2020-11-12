@@ -18,7 +18,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json --detectOpenHandles"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
@@ -65,9 +65,9 @@
     "eslint": "7.1.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.1",
-    "jest": "26.0.1",
+    "jest": "26.6.3",
     "prettier": "^1.19.1",
-    "supertest": "^4.0.2",
+    "supertest": "^6.0.1",
     "ts-jest": "26.1.0",
     "ts-loader": "^6.2.1",
     "ts-node": "^8.6.2",

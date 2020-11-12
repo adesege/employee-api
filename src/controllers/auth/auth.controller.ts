@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserDecorator } from 'decorators/user.decorator';
 import { SigninDTO } from 'dtos/signin.dto';
@@ -15,6 +15,7 @@ export class AuthController {
   ) { }
 
   @Post('signin')
+  @HttpCode(200)
   async login(@Body() body: SigninDTO): Promise<{ token: string; user: Partial<User> }> {
     const user = await this.authService.validateUser(body.email, body.password)
     if (!user) {

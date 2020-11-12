@@ -17,19 +17,19 @@ const IP_ADDRESS_NAME = 'IpAddress';
 @Schema()
 export class User {
   @Prop({ unique: true })
-  id: string;
+  id?: string;
 
   @Prop({ required: true })
-  firstName: string;
+  firstName?: string;
 
   @Prop({ required: true })
-  lastName: string;
+  lastName?: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  email?: string;
 
   @Prop({ required: true })
-  password: string;
+  password?: string;
 
   @Prop({ required: true })
   phone?: string;
