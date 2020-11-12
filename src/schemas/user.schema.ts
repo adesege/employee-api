@@ -1,4 +1,4 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { RolesEnum } from 'enums/roles.enum';
 import { StatusEnum } from 'enums/status.enum';
 import { Document, Types } from 'mongoose';
@@ -9,6 +9,7 @@ import { IpAddress } from './ip-address.schema';
 const bcryptService = new BcryptService();
 
 export type UserDocument = User & Document;
+type UserBankType = { accountNumber: number; };
 
 // TODO: Auto get the schema name by avoiding circular dependency
 const IP_ADDRESS_NAME = 'IpAddress';
@@ -29,6 +30,12 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: true })
+  phone?: string;
+
+  @Prop(raw({ accountNumber: { type: Number } }))
+  bank?: UserBankType;
 
   @Prop({ type: [Types.ObjectId], ref: IP_ADDRESS_NAME })
   ipAddresses?: IpAddress[];

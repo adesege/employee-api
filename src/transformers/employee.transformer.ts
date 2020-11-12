@@ -11,8 +11,12 @@ export class EmployeeTransformer extends BaseTransformer<User> {
       firstName: entity.firstName,
       lastName: entity.lastName,
       email: entity.email,
-      ipAddresses: new IpAddressTransformer(entity.ipAddresses) as unknown as Partial<IpAddress>[],
-      status: entity.status
+      ipAddresses: entity.ipAddresses ?
+        new IpAddressTransformer(entity.ipAddresses) as unknown as Partial<IpAddress>[] :
+        [],
+      status: entity.status,
+      phone: entity.phone,
+      bank: entity.bank
     }
   }
 

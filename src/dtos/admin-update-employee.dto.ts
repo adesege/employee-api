@@ -1,7 +1,7 @@
 import { IsEnum, IsIP, IsOptional } from "class-validator";
 import { StatusEnum } from "enums/status.enum";
 
-export class UpdateEmployeeDTO {
+export class AdminUpdateEmployeeDTO {
   @IsOptional()
   @IsIP('4', { message: 'Not a valid ip4 address' })
   ipAddress: string;
