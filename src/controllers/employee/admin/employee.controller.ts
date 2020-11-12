@@ -23,8 +23,7 @@ export class AdminEmployeeController {
   @Get()
   async search(@Query() query: SearchEmployeeDTO): Promise<EmployeeTransformer> {
     const employees = await this.userModel
-      .find({ $text: { $search: query.search, $caseSensitive: false } })
-      .select(['firstName', 'lastName', 'email', 'id']);
+      .find({ $text: { $search: query.search, $caseSensitive: false } });
 
     const newEmployees = await Promise.all(
       employees.map(async employee => ({

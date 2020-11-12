@@ -4,9 +4,14 @@ import { Model } from "mongoose";
 import { User, UserDocument } from "schemas/user.schema";
 import { AuthService } from "services/auth/auth.service";
 
-export const createUser = (app: INestApplication, attributes?: Partial<User>): Promise<UserDocument> => {
+export const createUser = (
+  app: INestApplication,
+  attributes?: Partial<User> | Partial<User>[]
+): Promise<UserDocument> | Promise<UserDocument[]> => {
   const userModel = app.get<Model<UserDocument>>(getModelToken(User.name));
-  return userModel.create(attributes);
+
+  // TODO: Refactor
+  return Array.isArray(attributes) ? userModel.create(attributes) : userModel.create(attributes);
 }
 
 export const signToken = (app: INestApplication, payload: Partial<User>): Promise<string> => {

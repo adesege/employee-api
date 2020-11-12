@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
 import { RolesEnum } from 'enums/roles.enum';
 import merge from 'lodash.merge';
-import { UserDocument } from 'schemas/user.schema';
+import { User, UserDocument } from 'schemas/user.schema';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { userMock } from './mocks/user.mock';
@@ -29,8 +29,8 @@ describe('AdminEmployee (e2e)', () => {
     configureApp(app);
     await app.init();
 
-    systemAdmin = await createUser(app, userAsSystemAdmin);
-    employee = await createUser(app, userAsEmployee);
+    systemAdmin = await createUser(app, userAsSystemAdmin) as UserDocument;
+    employee = await createUser(app, userAsEmployee) as UserDocument;
     employeeToken = await signToken(app, employee);
     systemAdminToken = await signToken(app, systemAdmin);
   });
@@ -126,4 +126,55 @@ describe('AdminEmployee (e2e)', () => {
     });
   })
 
+
+  describe('Search Employee', () => {
+    const evenOrOdd = (index: number) => index % 2 === 0 ? 'even' : 'odd';
+
+    it('should search employee by name', async () => {
+      const users = await Promise.all(Array.from({ length: 10 })
+        .map((_, index) => {
+          const user = userMock();
+          return {
+            ...user,
+            firstName: `${user.firstName} ${evenOrOdd(index)}`
+          }
+        }));
+      await createUser(app, users) as UserDocument[]
+      return request(app.getHttpServer())
+        .get('/api/admin/employees')
+        .query({ search: 'even' })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          expect(response.body).toHaveLength(5);
+        })
+    });
+
+    it('should search employee by email', async () => {
+      return request(app.getHttpServer())
+        .get('/api/admin/employees')
+        .query({ search: employee.email })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          const expected = response.body.find((item) => item.email === employee.email) as User;
+          expect(employee.email).toEqual(expected.email);
+          expect(employee.firstName).toEqual(expected.firstName);
+        })
+    });
+
+    it('should return empty array if no employee can be found', async () => {
+      return request(app.getHttpServer())
+        .get('/api/admin/employees')
+        .query({ search: 'not found' })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          expect(response.body.length).toBeFalsy();
+        })
+    });
+  });
 });
