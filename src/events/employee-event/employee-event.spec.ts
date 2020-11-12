@@ -25,7 +25,7 @@ describe('EmployeeEventService', () => {
   it('should be defined', () => {
     const updateEmployee = jest.fn();
     jest.spyOn(service, 'updateEmployee').mockImplementation(updateEmployee);
-    service.updateEmployee(userMock);
+    service.updateEmployee(userMock());
 
     expect(updateEmployee).toHaveBeenCalled();
     expect(service).toBeDefined();

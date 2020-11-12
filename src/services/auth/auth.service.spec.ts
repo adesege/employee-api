@@ -10,7 +10,7 @@ import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
-
+  const user = userMock();
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
@@ -37,7 +37,7 @@ describe('AuthService', () => {
   it('should call validateUser method', () => {
     const validateUser = jest.fn();
     jest.spyOn(service, 'validateUser').mockImplementation(validateUser)
-    service.validateUser(userMock.email, userMock.password);
+    service.validateUser(user.email, user.password);
 
     expect(validateUser).toBeCalled();
   });
@@ -45,13 +45,12 @@ describe('AuthService', () => {
   it('should call signToken method', () => {
     const signToken = jest.fn();
     jest.spyOn(service, 'signToken').mockImplementation(signToken)
-    service.signToken(userMock);
+    service.signToken(user);
 
     expect(signToken).toBeCalled();
   });
 
   it('should serialize auth object', () => {
-    const user = userMock;
     const json = service.toJSON(user);
 
     expect(user).toEqual(expect.objectContaining(json));
