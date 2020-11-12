@@ -2,6 +2,8 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
 import { RolesEnum } from 'enums/roles.enum';
+import { StatusEnum } from 'enums/status.enum';
+import faker from 'faker';
 import merge from 'lodash.merge';
 import { User, UserDocument } from 'schemas/user.schema';
 import request from 'supertest';
@@ -176,5 +178,57 @@ describe('AdminEmployee (e2e)', () => {
           expect(response.body.length).toBeFalsy();
         })
     });
+  });
+
+  describe('Update Employee', () => {
+    it('should update an employee ipAddress', () => {
+      const ipAddress = faker.internet.ip();
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${employee.id}`)
+        .send({ ipAddress })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          expect(response.body.ipAddresses[0].address).toEqual(ipAddress);
+        });
+    })
+
+    it('should update an employee status', () => {
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${employee.id}`)
+        .send({ status: StatusEnum.DEACTIVATED })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          expect(response.body.status).toEqual(StatusEnum.DEACTIVATED);
+        });
+    })
+
+    it('should not update an employee ipAddress if an invalid ipAddress is passed', () => {
+      const ipAddress = '127.0.0.0.0.1';
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${employee.id}`)
+        .send({ ipAddress })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(400)
+        .expect(response => {
+          expect(response.body.message).toContain('Not a valid ip4 address');
+        });
+    })
+
+    it('should not update an employee status if a wrong status is passed', () => {
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${employee.id}`)
+        .send({ status: 'deactivate' })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(400)
+        .expect(response => {
+          expect(response.body.message).toContain('Status must be one of activated, deactivated');
+        });
+    })
   });
 });

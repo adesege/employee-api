@@ -12,15 +12,15 @@ export class IpAddressService {
   async updateOrCreate(
     filter: MongooseFilterQuery<Pick<IpAddressDocument, "_id" | "address" | "user">>,
     attributes: Partial<IpAddress>
-  ): Promise<IpAddress> {
+  ): Promise<IpAddress[]> {
     const ipAddress = await this.ipAddressModel.findOne(filter);
     if (ipAddress) {
       ipAddress.address = attributes.address;
       ipAddress.user = attributes.user;
-      if (!ipAddress.isModified()) return ipAddress;
-      return ipAddress.save();
+      if (!ipAddress.isModified()) return [ipAddress];
+      return [await ipAddress.save()];
     }
 
-    return this.ipAddressModel.create(attributes);
+    return [await this.ipAddressModel.create(attributes)];
   }
 }

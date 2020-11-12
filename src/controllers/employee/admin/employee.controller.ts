@@ -53,7 +53,7 @@ export class AdminEmployeeController {
     if (!employee) {
       throw new NotFoundException('Employee not found. Update action failed');
     }
-    let ipAddresses: IpAddress;
+    let ipAddresses: IpAddress[];
 
     if (body.ipAddress) {
       ipAddresses = await this.ipAddressService.updateOrCreate(
