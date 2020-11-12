@@ -4,9 +4,11 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { BcryptService } from './bcrypt/bcrypt.service';
+import { BullConfigService } from './bull-config/bull-config.service';
 import { ConfigService } from './config/config.service';
 import { IpAddressService } from './ip-address/ip-address.service';
 import { JwtConfigService } from './jwt-config/jwt-config.service';
+import { MailService } from './mail/mail.service';
 import { MongooseConfigService } from './mongoose-config/mongoose-config.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
@@ -17,7 +19,9 @@ const providers = [
   AuthService,
   JwtConfigService,
   JwtStrategy,
-  IpAddressService
+  IpAddressService,
+  BullConfigService,
+  MailService
 ];
 
 @Global()
@@ -34,6 +38,9 @@ const providers = [
         MONGO_URI: Joi.string().uri().required(),
         JWT_EXPIRES_IN: Joi.string().default('1d'),
         JWT_SECRET: Joi.string().required(),
+        QUEUE_URL: Joi.string().uri().required(),
+        SMTP_URL: Joi.string().uri().required(),
+        MAIL_FROM: Joi.string().default('noreply@employee-api.com'),
       }).required()
     }),
     JwtModule.registerAsync({
