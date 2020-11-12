@@ -11,7 +11,10 @@ export class UpdateEmployeeDTO {
 
   @IsOptional()
   @IsMobilePhone('en-NG', { strictMode: true },
-    { message: 'Not a valid phone number. Ensure the country code is supplied' }
+    {
+      message: 'Not a valid phone number. \
+    Ensure the country code is supplied or it\'s in format +2348*********'
+    }
   )
   phone: string;
 

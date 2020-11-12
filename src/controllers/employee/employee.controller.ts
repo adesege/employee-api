@@ -27,11 +27,12 @@ export class EmployeeController {
     employee.phone = body.phone || employee.phone;
     employee.lastName = body.lastName || employee.lastName;
     employee.bank.accountNumber = body.accountNumber || employee.bank.accountNumber;
-    await employee.save();
 
     if (employee.isModified()) {
       await this.employeeEvent.updateEmployee(employee);
     }
+
+    await employee.save();
 
     return new EmployeeTransformer({ ...employee.toJSON(), ipAddresses: undefined });
   }

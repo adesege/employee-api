@@ -9,7 +9,8 @@ export const userMock = (): Partial<User> => ({
   lastName: faker.name.lastName(),
   email: faker.internet.email(),
   password: faker.internet.password(),
-  phone: faker.phone.phoneNumber(),
+  phone: faker.phone.phoneNumber('+2348#########'),
   roles: [RolesEnum.EMPLOYEE],
-  status: StatusEnum.ACTIVATED
+  status: StatusEnum.ACTIVATED,
+  bank: { accountNumber: faker.random.number(10) }
 })

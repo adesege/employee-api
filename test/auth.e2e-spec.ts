@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
-import faker from 'faker';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { userMock } from './mocks/user.mock';
@@ -44,7 +43,7 @@ describe('AuthController (e2e)', () => {
   it('should not log an employee in if password is incorrect', () => {
     return request(app.getHttpServer())
       .post('/api/auth/signin')
-      .send({ email: user.email, password: faker.internet.password() })
+      .send({ email: user.email, password: userMock().password })
       .accept('application/json')
       .expect(401)
       .expect(response => {
