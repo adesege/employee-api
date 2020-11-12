@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth/auth.service';
 import { BcryptService } from './bcrypt/bcrypt.service';
 import { ConfigService } from './config/config.service';
+import { IpAddressService } from './ip-address/ip-address.service';
 import { JwtConfigService } from './jwt-config/jwt-config.service';
 import { MongooseConfigService } from './mongoose-config/mongoose-config.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -15,7 +16,8 @@ const providers = [
   BcryptService,
   AuthService,
   JwtConfigService,
-  JwtStrategy
+  JwtStrategy,
+  IpAddressService
 ];
 
 @Global()

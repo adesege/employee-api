@@ -1,5 +1,7 @@
+import { IpAddress } from "schemas/ip-address.schema";
 import { User } from "schemas/user.schema";
 import { BaseTransformer } from "./base.transformer";
+import { IpAddressTransformer } from "./ip-address.transformer";
 
 export class EmployeeTransformer extends BaseTransformer<User> {
 
@@ -8,7 +10,9 @@ export class EmployeeTransformer extends BaseTransformer<User> {
       id: entity.id,
       firstName: entity.firstName,
       lastName: entity.lastName,
-      email: entity.email
+      email: entity.email,
+      ipAddresses: new IpAddressTransformer(entity.ipAddresses) as unknown as Partial<IpAddress>[],
+      status: entity.status
     }
   }
 

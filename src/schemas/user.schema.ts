@@ -1,12 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { RolesEnum } from 'enums/roles.enum';
-import { Document } from 'mongoose';
+import { StatusEnum } from 'enums/status.enum';
+import { Document, Types } from 'mongoose';
 import { BcryptService } from 'services/bcrypt/bcrypt.service';
-import { uuid } from 'utils/uuid';
+import { autoGenerateId } from 'utils/auto-generate-id';
+import { IpAddress } from './ip-address.schema';
 
 const bcryptService = new BcryptService();
 
 export type UserDocument = User & Document;
+
+// TODO: Auto get the schema name by avoiding circular dependency
+const IP_ADDRESS_NAME = 'IpAddress';
 
 @Schema()
 export class User {
@@ -25,8 +30,14 @@ export class User {
   @Prop({ required: true })
   password: string;
 
+  @Prop({ type: [Types.ObjectId], ref: IP_ADDRESS_NAME })
+  ipAddresses?: IpAddress[];
+
   @Prop({ type: [String], default: [RolesEnum.EMPLOYEE], enum: Object.values(RolesEnum) })
   roles?: RolesEnum[];
+
+  @Prop({ type: String, default: StatusEnum.ACTIVATED, enum: Object.values(StatusEnum) })
+  status?: StatusEnum;
 
   comparePassword: (value: string) => Promise<boolean>;
 }
@@ -44,7 +55,4 @@ UserSchema.pre<UserDocument>('save', async function encryptPassword() {
   this.password = await bcryptService.hash(this.password);
 });
 
-UserSchema.pre<UserDocument>('save', async function autoGenerateId() {
-  if (!!this.id) return;
-  this.id = uuid()
-});
+UserSchema.pre<UserDocument>('save', autoGenerateId);

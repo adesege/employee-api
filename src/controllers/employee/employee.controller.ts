@@ -1,17 +1,24 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateEmployeeDTO } from 'dtos/create-employee.dto';
 import { SearchEmployeeDTO } from 'dtos/search-employee.dto';
+import { UpdateEmployeeDTO } from 'dtos/update-employee.dto';
 import { SystemAdminGuard } from 'guards/system-admin.guard';
 import { Model } from 'mongoose';
+import { IpAddress, IpAddressDocument } from 'schemas/ip-address.schema';
 import { User, UserDocument } from 'schemas/user.schema';
+import { IpAddressService } from 'services/ip-address/ip-address.service';
 import { EmployeeTransformer } from 'transformers/employee.transformer';
 
 @Controller('admin/employees')
 @UseGuards(SystemAdminGuard)
 export class EmployeeController {
 
-  constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>) { }
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @InjectModel(IpAddress.name) private readonly ipAddressModel: Model<IpAddressDocument>,
+    private readonly ipAddressService: IpAddressService
+  ) { }
 
   @Get()
   async search(@Query() query: SearchEmployeeDTO): Promise<EmployeeTransformer> {
@@ -30,4 +37,27 @@ export class EmployeeController {
     return { message: 'Employee created successfully' };
   }
 
+  @Patch(':employeeId')
+  async update(
+    @Body() body: UpdateEmployeeDTO,
+    @Param('employeeId') employeeId: string
+  ): Promise<EmployeeTransformer> {
+    const employee = await this.userModel.findOne({ id: employeeId });
+    if (!employee) {
+      throw new NotFoundException('Employee not found. Update action failed');
+    }
+    let ipAddresses: IpAddress;
+
+    if (body.ipAddress) {
+      ipAddresses = await this.ipAddressService.updateOrCreate(
+        { user: employee._id, address: body.ipAddress },
+        { address: body.ipAddress, user: employee._id },
+      );
+    }
+
+    employee.status = body.status || employee.status;
+    employee.save();
+
+    return new EmployeeTransformer({ ...employee.toJSON(), ipAddresses });
+  }
 }
