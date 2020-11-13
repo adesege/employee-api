@@ -91,18 +91,22 @@ jobs:
           name: code-coverage-report-artifact
 
       - name: Upload coverage to Codecov for Unit tests
-        uses: coverallsapp/github-action@master
+        uses: codecov/codecov-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: coverage/lcov.info
-          flag-name: unit-tests
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ./coverage/clover.xml
+          flags: unit-tests
+          fail_ci_if_error: true
+          verbose: true
 
-      - name: Upload coverage to Codecov for E2E tests
-        uses: coverallsapp/github-action@master
+      - name: Upload coverage to Codecov for Unit tests
+        uses: codecov/codecov-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: test/coverage/lcov.info
-          flag-name: e2e-tests
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./test/coverage/clover.xml
+          flags: e2e-tests
+          fail_ci_if_error: true
+          verbose: true
 
   push_to_registry:
     name: Push Docker image to Docker Hub
