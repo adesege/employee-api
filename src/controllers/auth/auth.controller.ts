@@ -1,18 +1,13 @@
 import { Body, Controller, Get, HttpCode, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { UserDecorator } from 'decorators/user.decorator';
 import { SigninDTO } from 'dtos/signin.dto';
 import { EmployeeGuard } from 'guards/employee.guard';
-import { Model } from 'mongoose';
-import { User, UserDocument } from 'schemas/user.schema';
+import { User } from 'schemas/user.schema';
 import { AuthService } from 'services/auth/auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-    private readonly authService: AuthService
-  ) { }
+  constructor(private readonly authService: AuthService) { }
 
   @Post('signin')
   @HttpCode(200)
@@ -24,12 +19,12 @@ export class AuthController {
 
     const token = await this.authService.signToken(user);
 
-    return { token, user }
+    return { token, user: this.authService.toJSON(user) }
   }
 
   @Get('me')
   @UseGuards(EmployeeGuard)
   me(@UserDecorator() user: User): Partial<User> {
-    return user;
+    return this.authService.toJSON(user);
   }
 }

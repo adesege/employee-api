@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
 import { RolesEnum } from 'enums/roles.enum';
@@ -13,7 +13,7 @@ import { cleanupDocuments } from './utils/cleanup-document';
 import { createUser, signToken } from './utils/user';
 
 describe('AdminEmployee (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   let systemAdmin: UserDocument;
   let employee: UserDocument;
   let employeeToken: string;

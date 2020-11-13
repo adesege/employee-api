@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
 import request from 'supertest';
@@ -8,7 +8,7 @@ import { cleanupDocuments } from './utils/cleanup-document';
 import { createUser } from './utils/user';
 
 describe('AuthController (e2e)', () => {
-  let app: INestApplication;
+  let app: NestExpressApplication;
   const user = userMock();
 
   beforeAll(async () => {

@@ -21,7 +21,7 @@ export class AuthService {
 
     const isEqual = await user.comparePassword(password);
     if (isEqual) {
-      return { ...this.toJSON(user.toJSON()), password: undefined };
+      return { ...user.toJSON(), password: undefined };
     }
     return null;
   }

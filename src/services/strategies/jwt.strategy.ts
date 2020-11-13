@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PassportStrategy } from '@nestjs/passport';
+import { StatusEnum } from 'enums/status.enum';
 import { Model } from 'mongoose';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User, UserDocument } from 'schemas/user.schema';
@@ -26,13 +27,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const user = await this.userModel
-      .findOne({ id: payload.id })
+      .findOne({ id: payload.id, status: StatusEnum.ACTIVATED })
       .select(['id', 'firstName', 'lastName', 'roles']);
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    return this.authService.toJSON(user as Partial<User>);
+    return user.toJSON() as Partial<User>;
   }
 }

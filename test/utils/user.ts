@@ -10,8 +10,7 @@ export const createUser = (
 ): Promise<UserDocument> | Promise<UserDocument[]> => {
   const userModel = app.get<Model<UserDocument>>(getModelToken(User.name));
 
-  // TODO: Refactor
-  return Array.isArray(attributes) ? userModel.create(attributes) : userModel.create(attributes);
+  return userModel.create(attributes as any);
 }
 
 export const signToken = (app: INestApplication, payload: Partial<User>): Promise<string> => {
