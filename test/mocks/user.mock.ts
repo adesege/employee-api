@@ -12,5 +12,5 @@ export const userMock = (): Partial<User> => ({
   phone: faker.phone.phoneNumber('+2348#########'),
   roles: [RolesEnum.EMPLOYEE],
   status: StatusEnum.ACTIVATED,
-  bank: { accountNumber: faker.random.number(10) }
+  bank: { accountNumber: faker.random.number(1000000000) }
 })
