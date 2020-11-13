@@ -76,7 +76,6 @@ jobs:
           path: |
             coverage
             test/coverage
-            .coveralls.yml
 
   upload_coverage_report:
     name: Upload Coverage Report
@@ -84,10 +83,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
+      - uses: actions/checkout@v2
 
       - name: Download code coverage artifact
         uses: actions/download-artifact@v2
