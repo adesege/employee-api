@@ -48,7 +48,7 @@ describe('Employee (e2e)', () => {
     employeeToken = await signToken(app, employee);
 
     const employeeEvent = app.get<EmployeeEvent>(EmployeeEvent);
-    jest.spyOn(employeeEvent, 'updateEmployee').mockImplementationOnce(updateEmployeeHandler);
+    jest.spyOn(employeeEvent, 'updateEmployee').mockImplementation(updateEmployeeHandler);
   });
 
   afterAll(async () => {
