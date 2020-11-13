@@ -1,33 +1,32 @@
 version: '3'
 
 services:
-  nodejs:
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    image: nodejs
-    container_name: nodejs
+    container_name: backend
     restart: unless-stopped
     environment:
       - MONGO_USERNAME=$MONGO_USERNAME
       - MONGO_PASSWORD=$MONGO_PASSWORD
-      - MONGO_HOSTNAME=db
+      - MONGO_HOSTNAME=mongo
       - MONGO_PORT=$MONGO_PORT
       - MONGO_DB=$MONGO_DB
     ports:
       - "3500:3500"
     volumes:
       - ./dist:/www/app/dist
-      # - node_modules:/www/app/node_modules
+      - node_modules:/www/app/node_modules
     depends_on:
-      - db
+      - mongo
     networks:
       - app-network
-    command: sh ./scripts/wait-for.sh db:$MONGO_PORT -- yarn start:prod
+    command: sh ./scripts/wait-for.sh mongo:$MONGO_PORT -- yarn start:prod
 
-  db:
+  mongo:
     image: mongo:latest
-    container_name: db
+    container_name: mongo
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=$MONGO_USERNAME
