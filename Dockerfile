@@ -21,8 +21,6 @@ COPY --from=build /www/app/build /www/app
 
 WORKDIR /www/app
 
-RUN yarn install --production
-
 EXPOSE 3500
 
 CMD [ "dist/main.js" ]
