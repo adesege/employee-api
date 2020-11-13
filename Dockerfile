@@ -17,7 +17,7 @@ RUN yarn build
 
 FROM gcr.io/distroless/nodejs
 
-COPY --from=build /www/app /www/app
+COPY --from=build /www/app/build /www/app
 
 WORKDIR /www/app
 
