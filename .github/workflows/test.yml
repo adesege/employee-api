@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    name: Run Tests
 
     env:
       MONGO_URI: ${{secrets.MONGO_URI}}
@@ -91,26 +92,41 @@ jobs:
           name: code-coverage-report-artifact
 
       - name: Upload coverage to Codecov for Unit tests
-        uses: codecov/codecov-action@v1
+        uses: coverallsapp/github-action@master
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/clover.xml
-          flags: unit-tests
-          fail_ci_if_error: true
-          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage/lcov.info
+          flag-name: unit-tests
 
-      - name: Upload coverage to Codecov for Unit tests
-        uses: codecov/codecov-action@v1
+      - name: Upload coverage to Codecov for E2E tests
+        uses: coverallsapp/github-action@master
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./test/coverage/clover.xml
-          flags: e2e-tests
-          fail_ci_if_error: true
-          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: test/coverage/lcov.info
+          flag-name: e2e-tests
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create a GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tag_version.outputs.new_tag }}
+          release_name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
 
   push_to_registry:
     name: Push Docker image to Docker Hub
-    needs: test
+    needs: [test, release]
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
