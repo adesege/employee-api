@@ -1,0 +1,137 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      MONGO_URI: ${{secrets.MONGO_URI}}
+      JWT_EXPIRES_IN: ${{secrets.JWT_EXPIRES_IN}}
+      JWT_SECRET: ${{secrets.JWT_SECRET}}
+      QUEUE_URL: ${{secrets.QUEUE_URL}}
+      SMTP_URL: ${{secrets.SMTP_URL}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.3.0
+        with:
+          mongodb-version: '4.4.1'
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: '5.0.7'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Run Unit tests
+        run: yarn test:cov
+
+      - name: Run E2E tests
+        run: yarn test:e2e --coverage
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: production-build-artifact
+          path: |
+            dist
+            package.json
+            Dockerfile
+            docker-compose.yml
+            .dockerignore
+            !node_modules
+            
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report-artifact
+          path: |
+            coverage
+            test/coverage
+
+  upload_coverage_report:
+    name: Upload Coverage Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Download code coverage artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: code-coverage-report-artifact
+
+      - name: Upload coverage to Codecov for Unit tests
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage/lcov.info
+          flag-name: unit-tests
+          parallel: true
+
+      - name: Upload coverage to Codecov for E2E tests
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: test/coverage/lcov.info
+          flag-name: e2e-tests
+          parallel: true
+
+  push_to_registry:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Download production build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: production-build-artifact
+
+      - name: Push to Github Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: my-org/my-repo/my-image
+          tag_with_ref: true
+
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        parallel-finished: true

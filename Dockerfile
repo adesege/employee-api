@@ -1,0 +1,28 @@
+FROM node:12 as build
+
+WORKDIR /www/app/build
+
+RUN apt-get -q update && apt-get -qy install netcat
+
+COPY package.json ./
+COPY yarn.lock ./
+COPY tsconfig.json ./
+
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+
+FROM gcr.io/distroless/nodejs
+
+COPY --from=build /www/app /www/app
+
+WORKDIR /www/app
+
+RUN yarn install --production
+
+EXPOSE 3500
+
+CMD [ "yarn", "start:prod" ]
