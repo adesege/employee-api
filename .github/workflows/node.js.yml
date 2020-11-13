@@ -76,6 +76,7 @@ jobs:
 
   upload_coverage_report:
     name: Upload Coverage Report
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -107,6 +108,7 @@ jobs:
 
   push_to_registry:
     name: Push Docker image to Docker Hub
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -127,7 +129,7 @@ jobs:
           tag_with_ref: true
 
   finish:
-    needs: test
+    needs: upload_coverage_report
     runs-on: ubuntu-latest
     steps:
     - name: Coveralls Finished
