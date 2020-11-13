@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Employee API Test
 
 on:
   push:
@@ -96,7 +96,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage/lcov.info
           flag-name: unit-tests
-          parallel: true
 
       - name: Upload coverage to Codecov for E2E tests
         uses: coverallsapp/github-action@master
@@ -104,7 +103,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: test/coverage/lcov.info
           flag-name: e2e-tests
-          parallel: true
 
   push_to_registry:
     name: Push Docker image to Docker Hub
@@ -125,15 +123,5 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: my-org/my-repo/my-image
+          repository: adesege/employee-api/backend
           tag_with_ref: true
-
-  finish:
-    needs: upload_coverage_report
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        parallel-finished: true
