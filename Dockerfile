@@ -25,4 +25,4 @@ RUN yarn install --production
 
 EXPOSE 3500
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "dist/main.js" ]
