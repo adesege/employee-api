@@ -3,12 +3,15 @@ name: Employee API Test
 on:
   push:
     branches: [ master ]
+    tags:
+      - '*'
   pull_request:
     branches: [ master ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    name: Run Tests
 
     env:
       MONGO_URI: ${{secrets.MONGO_URI}}
@@ -16,6 +19,7 @@ jobs:
       JWT_SECRET: ${{secrets.JWT_SECRET}}
       QUEUE_URL: ${{secrets.QUEUE_URL}}
       SMTP_URL: ${{secrets.SMTP_URL}}
+      COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
 
     steps:
       - uses: actions/checkout@v2
@@ -64,7 +68,6 @@ jobs:
             Dockerfile
             docker-compose.yml
             .dockerignore
-            !node_modules
             
       - name: Archive code coverage results
         uses: actions/upload-artifact@v2
@@ -73,6 +76,7 @@ jobs:
           path: |
             coverage
             test/coverage
+            .coveralls.yml
 
   upload_coverage_report:
     name: Upload Coverage Report
@@ -91,26 +95,23 @@ jobs:
           name: code-coverage-report-artifact
 
       - name: Upload coverage to Codecov for Unit tests
-        uses: codecov/codecov-action@v1
+        uses: coverallsapp/github-action@master
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage/clover.xml
-          flags: unit-tests
-          fail_ci_if_error: true
-          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: coverage/lcov.info
+          flag-name: unit-tests
 
-      - name: Upload coverage to Codecov for Unit tests
-        uses: codecov/codecov-action@v1
+      - name: Upload coverage to Codecov for E2E tests
+        uses: coverallsapp/github-action@master
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./test/coverage/clover.xml
-          flags: e2e-tests
-          fail_ci_if_error: true
-          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: test/coverage/lcov.info
+          flag-name: e2e-tests
 
   push_to_registry:
     name: Push Docker image to Docker Hub
     needs: test
+    if: github.event_name != 'pull_request' && (endsWith(github.ref, github.event.repository.default_branch) || startsWith(github.ref, 'refs/tags/'))
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repo
@@ -152,7 +153,7 @@ jobs:
       - name: Push to Github Packages
         uses: docker/build-push-action@v2
         with:
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
