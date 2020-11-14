@@ -1,15 +1,12 @@
-import { getQueueToken } from '@nestjs/bull';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
 import { EmployeeEvent } from 'events/employee-event/employee-event';
-import { EMPLOYEE_EVENT_TYPE } from 'events/types';
 import faker from 'faker';
 import { IpAddressDocument } from 'schemas/ip-address.schema';
-import { User, UserDocument, UserSchema } from 'schemas/user.schema';
+import { UserDocument } from 'schemas/user.schema';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { QueueMock } from './mocks/queue.mock';
 import { userMock } from './mocks/user.mock';
 import { cleanupDocuments } from './utils/cleanup-document';
 import { createIpAddress } from './utils/ip-address';
@@ -27,16 +24,6 @@ describe('Employee (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-      providers: [EmployeeEvent,
-        {
-          provide: getQueueToken(User.name),
-          useValue: UserSchema
-        },
-        {
-          provide: getQueueToken(EMPLOYEE_EVENT_TYPE),
-          useClass: QueueMock
-        }
-      ]
     }).compile();
 
     app = moduleFixture.createNestApplication();
