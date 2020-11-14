@@ -15,12 +15,17 @@ COPY . .
 RUN yarn build
 
 
-FROM gcr.io/distroless/nodejs
+FROM node:12.19.0-alpine3.12
 
 COPY --from=build /www/app/build /www/app
 
 WORKDIR /www/app
 
+RUN yarn install --production
+
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
+RUN chmod +x /wait
+
 EXPOSE 3500
 
-CMD [ "dist/main.js" ]
+CMD [ "yarn", "start:prod" ]
