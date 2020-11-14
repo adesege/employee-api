@@ -1,6 +1,6 @@
 exclude_paths:
-  - "tests/"
-  - "node_modules/"
+  - "**/node_modules/"
+  - "**/test/"
   - "**/*.spec.ts"
   - "coverage/"
-  - "src/validations"
+  - "**/validations/"
