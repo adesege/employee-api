@@ -1,7 +1,6 @@
 import { getQueueToken } from '@nestjs/bull';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
-import Bull from 'bull';
 import { configureApp } from 'configure-app';
 import { EmployeeEvent } from 'events/employee-event/employee-event';
 import { EMPLOYEE_EVENT_TYPE } from 'events/types';
@@ -23,7 +22,7 @@ describe('Employee (e2e)', () => {
   let employeeIpAddress: IpAddressDocument;
 
   const userAsEmployee = userMock();
-  let updateEmployeeHandler: jest.SpyInstance<Promise<Bull.Job<any>>, [Partial<User>]>
+  const updateEmployeeHandler = jest.fn();
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -49,7 +48,7 @@ describe('Employee (e2e)', () => {
     employeeToken = await signToken(app, employee);
 
     const employeeEvent = app.get<EmployeeEvent>(EmployeeEvent);
-    updateEmployeeHandler = jest.spyOn(employeeEvent, 'updateEmployee');
+    jest.spyOn(employeeEvent, 'updateEmployee').mockImplementation(updateEmployeeHandler);
   });
 
   afterAll(async () => {

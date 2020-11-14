@@ -19,7 +19,6 @@ jobs:
       JWT_SECRET: ${{secrets.JWT_SECRET}}
       QUEUE_URL: ${{secrets.QUEUE_URL}}
       SMTP_URL: ${{secrets.SMTP_URL}}
-      COVERALLS_REPO_TOKEN: ${{secrets.COVERALLS_REPO_TOKEN}}
 
     steps:
       - uses: actions/checkout@v2
@@ -34,7 +33,15 @@ jobs:
         with:
           redis-version: '5.0.7'
 
-      - name: Cache node modules
+      - name: Use node.js v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Cache node_modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -44,18 +51,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
 
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '12.x'
-
-      - name: Install Dependencies
-        run: yarn install
-
-      - name: Run Unit tests
+      - name: Run unit tests
         run: yarn test:cov
 
-      - name: Run E2E tests
+      - name: Run e2e tests
         run: yarn test:e2e --coverage
 
       - name: Archive production artifacts
@@ -81,6 +80,8 @@ jobs:
     name: Upload Coverage Report
     needs: test
     runs-on: ubuntu-latest
+    env:
+      CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
 
     steps:
       - uses: actions/checkout@v2
@@ -90,28 +91,36 @@ jobs:
         with:
           name: code-coverage-report-artifact
 
-      - name: Upload coverage to Codecov for Unit tests
+      - name: Upload coverage to Coveralls for unit tests
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: coverage/lcov.info
           flag-name: unit-tests
 
-      - name: Upload coverage to Codecov for E2E tests
+      - name: Upload coverage to Coveralls for e2e tests
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: test/coverage/lcov.info
           flag-name: e2e-tests
 
+      - name: Publish code coverage to Codeclimate
+        uses: paambaati/codeclimate-action@v2.7.4
+        env:
+          CC_TEST_REPORTER_ID: ${CC_TEST_REPORTER_ID}
+        with:
+          coverageLocations: |
+            coverage/lcov.info
+            test/coverage/lcov.info
+
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Push Docker Image to Github Container Registry
     needs: test
     if: github.event_name != 'pull_request' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
       - name: Download production build artifact
         uses: actions/download-artifact@v2
@@ -146,7 +155,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.CR_PAT }}
 
-      - name: Push to Github Packages
+      - name: Push to GCR
         uses: docker/build-push-action@v2
         with:
           push: true
@@ -154,3 +163,16 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+
+  deploy:
+    name: Deploy to Heroku
+    needs: push_to_registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.6.8
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: employeee-api
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          usedocker: true
