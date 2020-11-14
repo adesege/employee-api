@@ -4,12 +4,14 @@ import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from 'services/config/config.service';
 import { JwtConfigService } from 'services/jwt-config/jwt-config.service';
-import { userMock } from '../../../test/mocks/user.mock';
-import { User, UserSchema } from '../../schemas/user.schema';
+import { userMock, UserModel, userModelFixture } from '../../../test/mocks/user.mock';
+import { User } from '../../schemas/user.schema';
 import { AuthService } from './auth.service';
 
 describe('AuthService', () => {
   let service: AuthService;
+  let userModel: typeof UserModel;
+
   const user = userMock();
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,11 +25,12 @@ describe('AuthService', () => {
         AuthService,
         ConfigService,
         JwtConfigService,
-        { provide: getModelToken(User.name), useValue: UserSchema }
+        { provide: getModelToken(User.name), useValue: UserModel }
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+    userModel = module.get<typeof UserModel>(getModelToken(User.name));
   });
 
   it('should be defined', () => {
@@ -35,16 +38,28 @@ describe('AuthService', () => {
   });
 
   it('should call validateUser method', () => {
-    const validateUser = jest.fn();
-    jest.spyOn(service, 'validateUser').mockImplementation(validateUser)
+    const validateUser = jest.spyOn(service, 'validateUser');
     service.validateUser(user.email, user.password);
 
     expect(validateUser).toBeCalled();
   });
 
+  it('should return null if user cannot be found', async () => {
+    jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+    const validateUser = await service.validateUser(user.email, user.password);
+
+    expect(validateUser).toEqual(null);
+  });
+
+  it('should return user with no password field if user is authenticated', async () => {
+    jest.spyOn(userModel, 'findOne').mockResolvedValue({ ...userModelFixture, comparePassword: () => true });
+    const validateUser = await service.validateUser(user.email, user.password);
+
+    expect(validateUser.password).not.toBeDefined();
+  });
+
   it('should call signToken method', () => {
-    const signToken = jest.fn();
-    jest.spyOn(service, 'signToken').mockImplementation(signToken)
+    const signToken = jest.spyOn(service, 'signToken');
     service.signToken(user);
 
     expect(signToken).toBeCalled();

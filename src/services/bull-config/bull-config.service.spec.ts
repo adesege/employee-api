@@ -16,4 +16,10 @@ describe('BullConfigService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should call createSharedConfiguration module', () => {
+    const createSharedConfiguration = jest.spyOn(service, 'createSharedConfiguration');
+    service.createSharedConfiguration();
+    expect(createSharedConfiguration).toHaveBeenCalled();
+  });
 });

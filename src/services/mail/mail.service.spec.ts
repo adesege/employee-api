@@ -21,8 +21,7 @@ describe('MailService', () => {
   });
 
   it('should be call sendMail method', () => {
-    const send = jest.fn()
-    jest.spyOn(service, 'send').mockImplementation(send);
+    const send = jest.spyOn(service, 'send');
     service.send({ to: userMock().email });
 
     expect(send).toBeCalled();

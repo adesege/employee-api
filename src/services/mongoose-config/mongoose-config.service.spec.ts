@@ -16,4 +16,10 @@ describe('MongooseConfigService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  it('should call createMongooseOptions module', () => {
+    const createMongooseOptions = jest.spyOn(service, 'createMongooseOptions');
+    service.createMongooseOptions();
+    expect(createMongooseOptions).toHaveBeenCalled();
+  });
 });

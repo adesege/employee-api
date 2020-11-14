@@ -2,11 +2,9 @@ import { Prop, raw, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { RolesEnum } from 'enums/roles.enum';
 import { StatusEnum } from 'enums/status.enum';
 import { Document, Types } from 'mongoose';
-import { BcryptService } from 'services/bcrypt/bcrypt.service';
 import { autoGenerateId } from 'utils/auto-generate-id';
+import { compareUserSchemaPassword, encryptUserSchemaPassword } from 'utils/bcrypt-schema-helper';
 import { IpAddress } from './ip-address.schema';
-
-const bcryptService = new BcryptService();
 
 export type UserDocument = User & Document;
 type UserBankType = { accountNumber: number; };
@@ -47,23 +45,13 @@ export class User {
   status?: StatusEnum;
 
   comparePassword: (value: string) => Promise<boolean>;
-
-  constructor(partial: Partial<User>) {
-    Object.assign(this, partial);
-  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
 UserSchema.index({ firstName: 'text', lastName: 'text', email: 'text' });
 
-UserSchema.methods.comparePassword = function comparePassword(value: string): Promise<boolean> {
-  return bcryptService.compare(value, this.password)
-};
+UserSchema.methods.comparePassword = compareUserSchemaPassword;
 
-UserSchema.pre<UserDocument>('save', async function encryptPassword() {
-  if (!this.isModified('password')) return;
-  this.password = await bcryptService.hash(this.password);
-});
-
+UserSchema.pre<UserDocument>('save', encryptUserSchemaPassword);
 UserSchema.pre<UserDocument>('save', autoGenerateId);
