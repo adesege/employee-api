@@ -1,7 +1,6 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModule } from '@nestjs/testing';
 import { configureApp } from 'configure-app';
-import { EmployeeEvent } from 'events/employee-event/employee-event';
 import faker from 'faker';
 import { IpAddressDocument } from 'schemas/ip-address.schema';
 import { UserDocument } from 'schemas/user.schema';
@@ -19,7 +18,6 @@ describe('Employee (e2e)', () => {
   let employeeIpAddress: IpAddressDocument;
 
   const userAsEmployee = userMock();
-  const updateEmployeeHandler = jest.fn();
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -33,9 +31,6 @@ describe('Employee (e2e)', () => {
     employee = await createUser(app, userAsEmployee) as UserDocument;
     employeeIpAddress = await createIpAddress(app, { user: employee._id, address: faker.internet.ip() });
     employeeToken = await signToken(app, employee);
-
-    const employeeEvent = app.get<EmployeeEvent>(EmployeeEvent);
-    jest.spyOn(employeeEvent, 'updateEmployee').mockImplementation(updateEmployeeHandler);
   });
 
   afterAll(async () => {
@@ -53,7 +48,6 @@ describe('Employee (e2e)', () => {
       .expect(200)
       .expect(response => {
         expect(response.body.bank.accountNumber).toEqual(accountNumber)
-        expect(updateEmployeeHandler).toHaveBeenCalled();
       });
   });
 
@@ -69,7 +63,6 @@ describe('Employee (e2e)', () => {
       .expect(200)
       .expect(response => {
         expect(response.body.lastName).toEqual(lastName)
-        expect(updateEmployeeHandler).toHaveBeenCalled();
       });
   });
 
