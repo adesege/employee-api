@@ -9,7 +9,7 @@
 A backend API that allow system admins to manage employees and also allow employees update their profile
 
 - [Docker Image](https://github.com/users/adesege/packages/container/package/employee-api%2Fbackend)
-- [Live url](https://employeee-api.herokuapp.com)
+- [API Endpoint](https://employeee-api.herokuapp.com/api) https://employeee-api.herokuapp.com/api
 
 ## Installation
 
