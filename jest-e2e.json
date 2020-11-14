@@ -1,0 +1,19 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testMatch": ["<rootDir>/test/**/*.e2e-spec.ts"],
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleDirectories": ["node_modules", "src"],
+  "coverageDirectory": "./test/coverage",
+  "collectCoverageFrom": ["src/**"],
+  "coveragePathIgnorePatterns": [
+    ".module.ts$",
+    ".spec.ts$",
+    "main.ts$",
+    "/coverage/",
+    "/test/coverage/"
+  ]
+}

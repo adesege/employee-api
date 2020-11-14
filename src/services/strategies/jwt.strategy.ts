@@ -22,13 +22,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: User): Promise<Partial<User>> {
-    if (!payload) {
+    if (!payload.id) {
       throw new UnauthorizedException();
     }
 
     const user = await this.userModel
       .findOne({ id: payload.id, status: StatusEnum.ACTIVATED })
-      .select(['id', 'firstName', 'lastName', 'roles']);
+      .select(['id', 'firstName', 'lastName', 'roles', 'email']);
 
     if (!user) {
       throw new UnauthorizedException();

@@ -56,7 +56,7 @@ export class AdminEmployeeController {
     let ipAddresses: IpAddress[];
 
     if (body.ipAddress) {
-      ipAddresses = await this.ipAddressService.updateOrCreate(
+      ipAddresses = await this.ipAddressService.createNew(
         { user: employee._id, address: body.ipAddress },
         { address: body.ipAddress, user: employee._id },
       );

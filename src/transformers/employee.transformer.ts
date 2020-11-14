@@ -1,9 +1,10 @@
 import { IpAddress } from "schemas/ip-address.schema";
 import { User } from "schemas/user.schema";
+import { BaseTransformerInterface } from "./base-transformer.interface";
 import { BaseTransformer } from "./base.transformer";
 import { IpAddressTransformer } from "./ip-address.transformer";
 
-export class EmployeeTransformer extends BaseTransformer<User> {
+export class EmployeeTransformer extends BaseTransformer<User> implements BaseTransformerInterface<User> {
 
   transform(entity: Partial<User>): Partial<User> {
     return {

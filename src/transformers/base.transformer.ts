@@ -9,6 +9,7 @@ export class BaseTransformer<T> implements BaseTransformerInterface<T> {
     this.entities = (this.isArray ? entities : [entities]) as T[];
   }
 
+  /* istanbul ignore next */
   transform(entity: T): Partial<T> {
     return { ...entity };
   }

@@ -98,8 +98,10 @@ describe('AdminEmployee (e2e)', () => {
         .post('/api/admin/employees')
         .set({ Authorization: `Bearer ${systemAdminToken}` })
         .send({
-          ...userMock(),
           email: newUserAsEmployee.email,
+          password: newUserAsEmployee.password,
+          firstName: newUserAsEmployee.firstName,
+          lastName: newUserAsEmployee.lastName,
         })
         .accept('application/json')
         .expect(400)
@@ -181,8 +183,21 @@ describe('AdminEmployee (e2e)', () => {
   });
 
   describe('Update Employee', () => {
-    it('should update an employee ipAddress', () => {
-      const ipAddress = faker.internet.ip();
+    const ipAddress = faker.internet.ip();
+
+    it('should add an ipAddress to an employee', () => {
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${employee.id}`)
+        .send({ ipAddress })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(200)
+        .expect(response => {
+          expect(response.body.ipAddresses[0].address).toEqual(ipAddress);
+        });
+    })
+
+    it('should not create ipAddress if it has already been added to the same employee', () => {
       return request(app.getHttpServer())
         .patch(`/api/admin/employees/${employee.id}`)
         .send({ ipAddress })
@@ -203,6 +218,18 @@ describe('AdminEmployee (e2e)', () => {
         .expect(200)
         .expect(response => {
           expect(response.body.status).toEqual(StatusEnum.DEACTIVATED);
+        });
+    })
+
+    it('should not update an employee status if the employee does not exist', () => {
+      return request(app.getHttpServer())
+        .patch(`/api/admin/employees/${faker.random.uuid()}`)
+        .send({ status: StatusEnum.DEACTIVATED })
+        .set({ Authorization: `Bearer ${systemAdminToken}` })
+        .accept('application/json')
+        .expect(404)
+        .expect(response => {
+          expect(response.body.message).toEqual('Employee not found. Update action failed');
         });
     })
 

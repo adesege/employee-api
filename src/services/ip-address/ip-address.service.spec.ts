@@ -24,27 +24,27 @@ describe('IpAddressService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('updateOrCreate methods', () => {
-    it('should call updateOrCreate method', async () => {
+  describe('createNew methods', () => {
+    it('should call createNew method', async () => {
       jest.spyOn<typeof IpAddressModel, 'findOne'>(ipAddressModel, 'findOne').mockResolvedValue(ipAddressFixture);
-      const updateOrCreate = await service.updateOrCreate({}, {});
+      const createNew = await service.createNew({}, {});
 
-      expect(updateOrCreate).toContain(ipAddressFixture);
+      expect(createNew).toContain(ipAddressFixture);
     });
 
-    it('should call updateOrCreate method when ipAddress has not been modified', async () => {
+    it('should call createNew method when ipAddress has not been modified', async () => {
       jest.spyOn(ipAddressFixture, 'isModified').mockReturnValue(false);
       jest.spyOn<typeof IpAddressModel, 'findOne'>(ipAddressModel, 'findOne').mockResolvedValue(ipAddressFixture);
-      const updateOrCreate = await service.updateOrCreate({}, {});
+      const createNew = await service.createNew({}, {});
 
-      expect(updateOrCreate).toContain(ipAddressFixture);
+      expect(createNew).toContain(ipAddressFixture);
     });
 
-    it('should call updateOrCreate method when ipAddress has not been modified', async () => {
+    it('should call createNew method when ipAddress has not been modified', async () => {
       jest.spyOn<typeof IpAddressModel, 'findOne'>(ipAddressModel, 'findOne').mockResolvedValue(null);
-      const updateOrCreate = await service.updateOrCreate({}, {});
+      const createNew = await service.createNew({}, {});
 
-      expect(updateOrCreate).toContain(ipAddressFixture);
+      expect(createNew).toContain(ipAddressFixture);
     });
   });
 

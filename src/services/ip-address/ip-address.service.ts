@@ -9,16 +9,13 @@ export class IpAddressService {
     @InjectModel(IpAddress.name) private readonly ipAddressModel: Model<IpAddressDocument>,
   ) { }
 
-  async updateOrCreate(
+  async createNew(
     filter: MongooseFilterQuery<Pick<IpAddressDocument, "_id" | "address" | "user">>,
     attributes: Partial<IpAddress>
   ): Promise<IpAddress[]> {
     const ipAddress = await this.ipAddressModel.findOne(filter);
     if (ipAddress) {
-      ipAddress.address = attributes.address;
-      ipAddress.user = attributes.user;
-      if (!ipAddress.isModified()) return [ipAddress];
-      return [await ipAddress.save()];
+      return [ipAddress];
     }
 
     return [await this.ipAddressModel.create(attributes)];
