@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserDecorator } from 'decorators/user.decorator';
 import { SigninDTO } from 'dtos/signin.dto';
 import { EmployeeGuard } from 'guards/employee.guard';
@@ -25,6 +25,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @ApiBearerAuth()
   @UseGuards(EmployeeGuard)
   me(@UserDecorator() user: User): Partial<User> {
     return this.authService.toJSON(user);

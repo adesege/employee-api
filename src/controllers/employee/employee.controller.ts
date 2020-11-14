@@ -1,6 +1,6 @@
 import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiTags } from '@nestjs/swagger';
 import { UserDecorator } from 'decorators/user.decorator';
 import { UpdateEmployeeDTO } from 'dtos/update-employee-dto';
 import { EmployeeEvent } from 'events/employee-event/employee-event';
@@ -10,6 +10,7 @@ import { User, UserDocument } from 'schemas/user.schema';
 import { EmployeeTransformer } from 'transformers/employee.transformer';
 
 @ApiTags('Employees')
+@ApiBearerAuth()
 @Controller('employees')
 @UseGuards(EmployeeGuard)
 export class EmployeeController {

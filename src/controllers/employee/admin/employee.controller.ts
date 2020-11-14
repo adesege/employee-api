@@ -1,6 +1,6 @@
 import { Body, Controller, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AdminUpdateEmployeeDTO } from 'dtos/admin-update-employee.dto';
 import { CreateEmployeeDTO } from 'dtos/create-employee.dto';
 import { SearchEmployeeDTO } from 'dtos/search-employee.dto';
@@ -12,6 +12,7 @@ import { IpAddressService } from 'services/ip-address/ip-address.service';
 import { EmployeeTransformer } from 'transformers/employee.transformer';
 
 @ApiTags('Admin Employees')
+@ApiBearerAuth()
 @Controller('admin/employees')
 @UseGuards(SystemAdminGuard)
 export class AdminEmployeeController {
