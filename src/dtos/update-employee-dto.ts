@@ -1,14 +1,18 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsAlphanumeric, IsMobilePhone, IsNumber, IsOptional } from "class-validator";
 
 export class UpdateEmployeeDTO {
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsNumber()
   accountNumber: number;
 
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsAlphanumeric()
   lastName: string;
 
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsMobilePhone('en-NG', { strictMode: true },
     {

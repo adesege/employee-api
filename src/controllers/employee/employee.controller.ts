@@ -1,5 +1,6 @@
 import { Body, Controller, Patch, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { UserDecorator } from 'decorators/user.decorator';
 import { UpdateEmployeeDTO } from 'dtos/update-employee-dto';
 import { EmployeeEvent } from 'events/employee-event/employee-event';
@@ -8,6 +9,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from 'schemas/user.schema';
 import { EmployeeTransformer } from 'transformers/employee.transformer';
 
+@ApiTags('Employees')
 @Controller('employees')
 @UseGuards(EmployeeGuard)
 export class EmployeeController {
@@ -17,6 +19,10 @@ export class EmployeeController {
     private readonly employeeEvent: EmployeeEvent
   ) { }
 
+  @ApiHeader({
+    name: 'X-Forwarded-For',
+    description: 'Ip Address',
+  })
   @Patch()
   async update(
     @Body() body: UpdateEmployeeDTO,

@@ -10,8 +10,17 @@ A backend API that allow system admins to manage employees and also allow employ
 
 - [Docker Image](https://github.com/users/adesege/packages/container/package/employee-api%2Fbackend)
 - [API Endpoint https://employeee-api.herokuapp.com/api](https://employeee-api.herokuapp.com/api)
+- TRY IT! [Swagger Documentation](https://employeee-api.herokuapp.com)
+  - Super Admin Credentials
+    - Email: `admin@test.com`
+    - Password: `system.admin1`
 
 - Uses queue
+- Uses Github Actions to test and deploy application
+- Uses Docker for deploy api to heroku
+- Uses MongoDB as the datastore
+- Uses IP to restrict employee access
+- Uses Mailtrap for trapping emails
 
 ## Installation
 
@@ -68,6 +77,7 @@ $ yarn run start:dev
 
 > API will be accessible via http://localhost:3500/api
 
+> To test super admin endpoints locally, manually create a user then assign `system_admin` role to it.
 
 ## Test
 

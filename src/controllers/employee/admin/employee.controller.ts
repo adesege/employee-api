@@ -1,5 +1,6 @@
 import { Body, Controller, Get, HttpCode, NotFoundException, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { AdminUpdateEmployeeDTO } from 'dtos/admin-update-employee.dto';
 import { CreateEmployeeDTO } from 'dtos/create-employee.dto';
 import { SearchEmployeeDTO } from 'dtos/search-employee.dto';
@@ -10,6 +11,7 @@ import { User, UserDocument } from 'schemas/user.schema';
 import { IpAddressService } from 'services/ip-address/ip-address.service';
 import { EmployeeTransformer } from 'transformers/employee.transformer';
 
+@ApiTags('Admin Employees')
 @Controller('admin/employees')
 @UseGuards(SystemAdminGuard)
 export class AdminEmployeeController {
@@ -20,6 +22,7 @@ export class AdminEmployeeController {
     private readonly ipAddressService: IpAddressService
   ) { }
 
+  @ApiQuery({ name: 'search' })
   @Get()
   async search(@Query() query: SearchEmployeeDTO): Promise<EmployeeTransformer> {
     const employees = await this.userModel
@@ -44,6 +47,7 @@ export class AdminEmployeeController {
     return new EmployeeTransformer(employee.toJSON());
   }
 
+  @ApiParam({ name: 'employeeId' })
   @Patch(':employeeId')
   async update(
     @Body() body: AdminUpdateEmployeeDTO,
